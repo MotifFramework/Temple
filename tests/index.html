@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Temple Unit Tests</title>
+        <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.14.0.css">
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+
+
+        <template id="template-truth">
+            Shown.
+
+            <!-- Conditional: is `person` true? -->
+            <div data-true="person">
+                Never Shown!
+            </div>
+        </template>
+        <template id="template-arrays">
+            <b data-id="repo"></b>
+        </template>
+
+        <!-- Nested Temples -->
+        <template id="template-names">
+            <h2>Names</h2>
+
+            <!-- Conditional: is `names` true? -->
+            <div data-true="names">
+
+                <!-- Sub-template: `template-user` -->
+                <br data-template="template-user">
+            </div>
+        </template>
+
+        <template id="template-user">
+            <b data-true="name">
+                <b data-template="template-password"></b>
+            </b>
+        </template>
+
+        <template id="template-password">
+            <strong data-id="pass"></strong>
+            <div>
+                <a data-id="link"></a>
+            </div>
+        </template>
+        <!-- END Nested Temples -->
+
+        <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
+
+        <script src="../temple.js"></script>
+        <script src="unit/temple.js"></script>
+    </body>
+</html>
