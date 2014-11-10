@@ -17,7 +17,7 @@ if (this.Element) {
     }( Element.prototype ));
 }
 
-;(function ( window, document, undefined ) {
+;(function( window, document, undefined ) {
 
     "use strict";
 
@@ -27,7 +27,7 @@ if (this.Element) {
      * @param id {Object|String}
      * @return {Object} Temple object
      */
-    var Temple = function ( id ) {
+    var Temple = function( id ) {
         this.initVars( id );
 
         return this;
@@ -47,20 +47,19 @@ if (this.Element) {
          * @param id {Object|String}
          * @return {Object} Temple object
          */
-        "initVars": function ( id ) {
+        "initVars": function initVars( id ) {
 
             /**
              * Get the original template
-             * 
+             *
              * @property original
              * @type Object
              */
             this.original = id.nodeName ? id : document.getElementByID( id );
 
-
             /**
              * Create our cloned template
-             * 
+             *
              * @property template
              * @type DocumentFragment
              */
@@ -74,12 +73,12 @@ if (this.Element) {
 
         /**
          * To fully render and return a populated template's HTML
-         * 
+         *
          * @method render
          * @param values {Object} The data with which to populate our template
          * @return {DocumentFragment} Constructed template fragment
          */
-        "render": function ( values ) {
+        "render": function render( values ) {
 
             /*
             First find sub-templates
@@ -92,7 +91,7 @@ if (this.Element) {
             /*
             Then populate all the values
             */
-            this.output = this.template.cloneNode(true);
+            this.output = this.template.cloneNode( true );
             this.output = this.populateTemplate( this.output, values );
 
             /*
@@ -105,12 +104,12 @@ if (this.Element) {
 
         /**
          * Looks to nest partials into one template
-         * 
+         *
          * @method nestTemplates
          * @param parent {Object} The current parent element from which to start
          * @return parent {Object}
          */
-        "nestTemplates": function ( parent ) {
+        "nestTemplates": function nestTemplates( parent ) {
 
             /*
             Find the sub-templates of the provided parent selector
@@ -129,7 +128,7 @@ if (this.Element) {
                 /*
                 ...loop through them
                 */
-                [].forEach.call( subTemplates, function replaceWithPartial ( placeholderElem ) {
+                [].forEach.call( subTemplates, function replaceWithPartial( placeholderElem ) {
                     directParent = placeholderElem.parentNode;
 
                     /*
@@ -155,13 +154,13 @@ if (this.Element) {
 
         /**
          * Populate the template with values
-         * 
+         *
          * @method populateTemplate
          * @param parent {Object} The current parent element from which to start
          * @param data {Object} The values with which to populate
          * @return template {DocumentFragment} The entire template so far
          */
-        "populateTemplate": function ( parent, data ) {
+        "populateTemplate": function populateTemplate( parent, data ) {
             var self = this,
 
                 /*
@@ -182,13 +181,11 @@ if (this.Element) {
                 key,
                 valueExists;
 
-            console.log(this.template);
-
             /*
             If there are any temples to populate
             */
             if ( temples.length ) {
-                [].forEach.call( temples, function ( elem ) {
+                [].forEach.call( temples, function( elem ) {
 
                     /*
                     Does this want truth or false?
@@ -226,7 +223,7 @@ if (this.Element) {
                         self.output = self.addData( elem, valueExists );
                     }
                 });
-console.log(self.output);
+
                 return self.output;
             }
             return self.output;
@@ -234,14 +231,14 @@ console.log(self.output);
 
         /**
          * Check if the elements are nested in other temple values
-         * 
+         *
          * @method nestedElems
          * @param elems {Object} The elements to check
          * @param selector {String} The selector string to test against
          * @param parent {Object} What element to test until
          * @return matchedElems {Array} Set of elements that are indeed nested
          */
-        "nestedElems": function ( elems, selector, parent ) {
+        "nestedElems": function( elems, selector, parent ) {
             var matchedElems = [],
                 traversingElem;
 
@@ -249,15 +246,15 @@ console.log(self.output);
             We will check each element for a parent element
             that matches the selector (until the provided parent)
             */
-            [].forEach.call( elems, function ( elem, index ) {
+            [].forEach.call( elems, function( elem, index ) {
                 traversingElem = elem.parentNode || null;
 
                 /*
-                As long as the traversing element is not the 
+                As long as the traversing element is not the
                 body and is not yet the provided parent elem
                 */
                 while ( traversingElem && traversingElem !== document.body && traversingElem !== parent ) {
-                    
+
                     /*
                     Does it match the selector?
                     */
@@ -266,7 +263,7 @@ console.log(self.output);
                         /*
                         Push it into an array
                         */
-                        matchedElems.push(elem);
+                        matchedElems.push( elem );
 
                         /*
                         Break the loop
@@ -280,26 +277,26 @@ console.log(self.output);
                     traversingElem = traversingElem.parentNode;
                 }
             });
-        
+
             return matchedElems;
         },
 
         /**
          * Filter elements
-         * 
+         *
          * @method not
          * @param all {Object} All possible elements
          * @param excluded {Object} Elements to exclude
          * @return passes {Array} Elements that were not part of the excluded group
          */
-        "not": function ( all, excluded ) {
+        "not": function( all, excluded ) {
             var passes = [],
                 isExcluded = false;
 
             /*
             Loop through all the provided elements
             */
-            [].forEach.call( all, function ( elem ) {
+            [].forEach.call( all, function( elem ) {
 
                 /*
                 Start off assuming that it is not
@@ -310,7 +307,7 @@ console.log(self.output);
                 /*
                 Loop through the to-be-excluded elems
                 */
-                [].forEach.call( excluded, function ( exclude ) {
+                [].forEach.call( excluded, function( exclude ) {
 
                     /*
                     If they match, mark it as excluded
@@ -333,38 +330,34 @@ console.log(self.output);
 
         /**
          * Checks if the temple is looking for truth
-         * 
+         *
          * @method wantsTruth
          * @param elem {Object} The current temple
          * @return {Boolean}
          */
-        "wantsTruth": function ( elem ) {
+        "wantsTruth": function wantsTruth( elem ) {
             return elem.hasAttribute("data-false") ? false : true;
         },
 
         /**
          * Populate the template with values
-         * 
+         *
          * @method checkForValue
          * @param key {String} The key that we want to find in the data
          * @param values {Object} The values to check against
          * @return {Boolean|Object} Object of data corresponding to the key, otherwise `false`
          */
-        "checkForValue": function ( key, values ) {
+        "checkForValue": function checkForValue( key, values ) {
             var data,
                 keyValue,
                 typeOfValue,
                 i;
-
-            console.log(key);
-            console.log(values);
 
             /*
             If the key is in the provided JSON values...
             */
             if ( values.hasOwnProperty( key ) ) {
                 keyValue = values[ key ];
-                console.log(keyValue);
 
                 /*
                 Early boot if it's false
@@ -428,12 +421,12 @@ console.log(self.output);
 
         /**
          * Returning the appropriate type of the value
-         * 
+         *
          * @method typeOfValue
-         * @param value {Object|Array|String} 
+         * @param value {Object|Array|String}
          * @return typeOf {String}
          */
-        "typeOfValue": function ( value ) {
+        "typeOfValue": function typeOfValue( value ) {
             var typeOf = typeof value;
 
             /*
@@ -452,12 +445,12 @@ console.log(self.output);
 
         /**
          * Checking whether or not an object is actually an array
-         * 
+         *
          * @method isArray
-         * @param arr {Object|Array} 
+         * @param arr {Object|Array}
          * @return {Boolean}
          */
-        "isArray": function ( arr ) {
+        "isArray": function isArray( arr ) {
             if ( Object.prototype.toString.call( arr ) === "[object Array]" ) {
                 return true;
             }
@@ -466,12 +459,12 @@ console.log(self.output);
 
         /**
          * Remove an element
-         * 
+         *
          * @method removeElem
          * @param elem {Object} The element to remove
          * @return parent {Object} The parent node the element belonged to
          */
-        "removeElem": function ( elem ) {
+        "removeElem": function removeElem( elem ) {
             var parent = elem.parentNode;
 
             parent.removeChild( elem );
@@ -481,13 +474,13 @@ console.log(self.output);
 
         /**
          * Add data to the element
-         * 
+         *
          * @method addData
          * @param elem {Object} The element to populate
          * @param data {Object} Values to populate with, and what type the value is
          * @return template {DocumentFragment} The entire template so far
          */
-        "addData": function ( elem, data ) {
+        "addData": function addData( elem, data ) {
             switch ( data.typeOf ) {
 
                 /*
@@ -507,7 +500,7 @@ console.log(self.output);
                     break;
 
                 case "boolean":
-                    this.
+                    // this.
 
                 /*
                 Otherwise, it's just text
@@ -521,24 +514,23 @@ console.log(self.output);
 
         /**
          * Populate the template when an array is provided
-         * 
+         *
          * @method arrays
          * @param elem {Object} The element to populate
          * @param data {Array} Values to populate with
          * @return newElems {DocumentFragment} Fragment of new values that we plop in
          */
-        "arrays": function ( elem, data ) {
+        "arrays": function arrays( elem, data ) {
             var key = 0,
                 valuesLength = data.length,
                 newElems = document.createDocumentFragment(),
                 elemCopy,
                 typeOfValue;
 
-
             /*
             Looping through the array...
             */
-            for ( ; key < valuesLength; key += 1) {
+            for ( ; key < valuesLength; key += 1 ) {
 
                 /*
                 Clone the element
@@ -557,13 +549,13 @@ console.log(self.output);
                 }
                 newElems.appendChild( elemCopy );
             }
-            elem.parentNode.insertBefore(newElems.cloneNode(true), elem);
-            elem.parentNode.removeChild(elem);
+            elem.parentNode.insertBefore( newElems.cloneNode( true ), elem );
+            elem.parentNode.removeChild( elem );
 
             return newElems;
         },
 
-        "evaluateTruths": function ( parent, data ) {
+        "evaluateTruths": function evaluateTruths( parent, data ) {
             var conditionalElem = parent.querySelector("[data-true], [data-false]");
 
             if ( conditionalElem ) {
@@ -586,7 +578,7 @@ console.log(self.output);
             }
         },
 
-        "clearTruths": function () {
+        "clearTruths": function clearTruths() {
             var self = this,
                 truths = self.output.querySelector("[data-true], [data-false]");
 
@@ -597,16 +589,15 @@ console.log(self.output);
             return self.output;
         },
 
-        "removeWrapper": function ( elem ) {
+        "removeWrapper": function removeWrapper( elem ) {
             var parent = elem.parentNode,
                 children = elem.children,
                 childCount = children.length,
                 newElems = document.createDocumentFragment(),
                 i = 0;
 
-
-            [].forEach.call( children, function (el) {
-                newElems.appendChild( el.cloneNode(true) );
+            [].forEach.call( children, function( el ) {
+                newElems.appendChild( el.cloneNode( true ) );
             });
 
             parent.insertBefore( newElems, elem );
@@ -617,4 +608,4 @@ console.log(self.output);
     };
 
     window.Temple = Temple;
-}(window, document));
+}( window, document ));
