@@ -10,6 +10,16 @@
         <div id="qunit-fixture"></div>
 
 
+        <!--
+         - ==========================================================================
+         - Templates
+         - ==========================================================================
+         -->
+        
+        <!--
+         - Truths
+         - ==========================================================================
+         -->
         <template id="template-truth">
             Shown.
 
@@ -18,11 +28,11 @@
                 Never Shown!
             </div>
         </template>
-        <template id="template-arrays">
-            <b data-id="repo"></b>
-        </template>
 
-        <!-- Nested Temples -->
+        <!--
+         - Nested Templates
+         - ==========================================================================
+         -->
         <template id="template-names">
             <h2>Names</h2>
 
@@ -46,7 +56,39 @@
                 <a data-id="link"></a>
             </div>
         </template>
-        <!-- END Nested Temples -->
+
+        <!--
+         - Array Templates
+         - ==========================================================================
+         -->
+        <template id="template-arrays">
+            <b data-id="repo"></b>
+        </template>
+
+        <!--
+         - Attribute Templates
+         - ==========================================================================
+         -->
+        <template id="template-attributes">
+            <section>
+                <h2 data-id="heading"></h2>
+                <p data-id="paragraph"></p>
+                <br data-template="template-attributes__list">
+                <br data-template="template-attributes__ordered">
+            </section>
+        </template>
+
+        <template id="template-attributes__list">
+            <ul data-id="list">
+                <li data-id="list-item"></li>
+            </ul>
+        </template>
+
+        <template id="template-attributes__ordered">
+            <ol data-id="ordered">
+                <li data-id="list-item"></li>
+            </ol>
+        </template>
 
         <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
 

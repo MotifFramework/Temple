@@ -39,7 +39,8 @@ if (this.Element) {
             "trueSelector": "data-true",
             "falseSelector": "data-false",
             "partialSelector": "data-template",
-            "leaveConditionalWrapper": true
+            "leaveConditionalSelector": "data-leave",
+            "leaveConditional": false
         },
 
         /**
@@ -95,7 +96,7 @@ if (this.Element) {
             this.output = this.populateTemplate( this.output, values );
 
             /*
-            Lastly, clear all trues/falses
+            Lastly, clear all true/false wrappers
             */
             this.output = this.clearTruths();
 
@@ -115,7 +116,7 @@ if (this.Element) {
             Find the sub-templates of the provided parent selector
             */
             var self = this,
-                subTemplates = parent.querySelectorAll("[" + self.config.partialSelector + "]"),
+                subTemplates = parent.querySelectorAll( "[" + self.config.partialSelector + "]" ),
                 targetTemplate = null,
                 templatePartial = null,
                 directParent = null;
@@ -128,19 +129,19 @@ if (this.Element) {
                 /*
                 ...loop through them
                 */
-                [].forEach.call( subTemplates, function replaceWithPartial( placeholderElem ) {
-                    directParent = placeholderElem.parentNode;
+                [].forEach.call( subTemplates, function replaceWithPartial( placeholder ) {
+                    directParent = placeholder.parentNode;
 
                     /*
                     Clone the sub template
                     */
-                    targetTemplate = document.getElementById( placeholderElem.getAttribute( self.config.partialSelector ) );
+                    targetTemplate = document.getElementById( placeholder.getAttribute( self.config.partialSelector ) );
                     templatePartial = targetTemplate.content.cloneNode( true );
 
                     /*
                     Replace our placeholder elem with the new code
                     */
-                    directParent.replaceChild( templatePartial, placeholderElem );
+                    directParent.replaceChild( templatePartial, placeholder );
                 });
 
                 /*
@@ -166,7 +167,7 @@ if (this.Element) {
                 /*
                 Get all temples
                 */
-                all = parent.querySelectorAll("[data-id], [data-true], [data-false]"),
+                all = parent.querySelectorAll( "[data-id], [data-true], [data-false]" ),
 
                 /*
                 Get temples that are nested into other temples
@@ -238,7 +239,7 @@ if (this.Element) {
          * @param parent {Object} What element to test until
          * @return matchedElems {Array} Set of elements that are indeed nested
          */
-        "nestedElems": function( elems, selector, parent ) {
+        "nestedElems": function nestedElems( elems, selector, parent ) {
             var matchedElems = [],
                 traversingElem;
 
@@ -246,7 +247,7 @@ if (this.Element) {
             We will check each element for a parent element
             that matches the selector (until the provided parent)
             */
-            [].forEach.call( elems, function( elem, index ) {
+            [].forEach.call( elems, function( elem ) {
                 traversingElem = elem.parentNode || null;
 
                 /*
@@ -336,7 +337,7 @@ if (this.Element) {
          * @return {Boolean}
          */
         "wantsTruth": function wantsTruth( elem ) {
-            return elem.hasAttribute("data-false") ? false : true;
+            return elem.hasAttribute( "data-false" ) ? false : true;
         },
 
         /**
@@ -350,7 +351,6 @@ if (this.Element) {
         "checkForValue": function checkForValue( key, values ) {
             var data,
                 keyValue,
-                typeOfValue,
                 i;
 
             /*
@@ -496,7 +496,7 @@ if (this.Element) {
                 to check for nested temples
                 */
                 case "object":
-                    this.populateTemplate( elem, data.keyValue );
+                    this.objects( elem, data.keyValue );
                     break;
 
                 case "boolean":
@@ -505,11 +505,37 @@ if (this.Element) {
                 /*
                 Otherwise, it's just text
                 */
-                default:
-                    elem.textContent = data.keyValue;
+                case "string":
+                    this.addText( elem, data.keyValue, data.typeOf );
                     break;
             }
             return this.output;
+        },
+
+        "addAttributes": function addAttributes( elem, data ) {
+            var attr,
+                attrData;
+
+            if ( data.hasOwnProperty( "@" ) && this.typeOfValue( data["@"] === "object" ) ) {
+                attrData = data["@"];
+                for ( attr in attrData ) {
+                    if ( attrData.hasOwnProperty( attr ) && this.typeOfValue( attrData[ attr ] === "string" ) ) {
+                        elem.setAttribute( attr, attrData[ attr ] );
+                    }
+                }
+            }
+
+            return elem;
+        },
+
+        "addText": function addText( elem, data, typeOfValue ) {
+            if ( typeOfValue === "object" && data.hasOwnProperty( "html" ) && this.typeOfValue( data.html ) === "string" ) {
+                elem.textContent = data.html;
+            } else if ( typeOfValue === "string" ) {
+                elem.textContent = data;
+            }
+
+            return elem;
         },
 
         /**
@@ -540,12 +566,12 @@ if (this.Element) {
                 /*
                 Get the type of value of the data in the array
                 */
-                typeOfValue = this.typeOfValue( data );
+                typeOfValue = this.typeOfValue( data[key] );
 
                 if ( typeOfValue === "object" ) {
-                    this.populateTemplate( elemCopy, data[key] );
+                    this.objects( elemCopy, data[key] );
                 } else {
-                    elemCopy.textContent = data[key];
+                    this.addText( elemCopy, data[key], typeOfValue );
                 }
                 newElems.appendChild( elemCopy );
             }
@@ -554,22 +580,28 @@ if (this.Element) {
 
             return newElems;
         },
+        "objects": function objects( elem, data ) {
+            this.addAttributes( elem, data );
+            this.addText( elem, data, "object" );
+            this.populateTemplate( elem, data );
+        },
 
         "evaluateTruths": function evaluateTruths( parent, data ) {
-            var conditionalElem = parent.querySelector("[data-true], [data-false]");
+            var config = this.config,
+                elem = parent.querySelector( "[" + config.trueSelector + "], [" + config.falseSelector + "]" );
 
-            if ( conditionalElem ) {
+            if ( elem ) {
 
-                var wantsTruth = this.wantsTruth( conditionalElem ),
-                    key = wantsTruth ? conditionalElem.getAttribute("data-true") : conditionalElem.getAttribute("data-false"),
+                var wantsTruth = this.wantsTruth( elem ),
+                    key = elem.getAttribute( config.trueSelector ) || elem.getAttribute( config.falseSelector ),
                     valueExists = this.checkForValue( key, data );
 
                 if ( ( valueExists && !wantsTruth ) || ( !valueExists && wantsTruth ) ) {
-                    this.output = this.removeElem( conditionalElem );
+                    this.output = this.removeElem( elem );
 
                     return this.output;
                 } else {
-                    this.output = this.evaluateTruths( conditionalElem, data[ key ] );
+                    this.output = this.evaluateTruths( elem, data[ key ] );
 
                     return this.output;
                 }
@@ -579,22 +611,23 @@ if (this.Element) {
         },
 
         "clearTruths": function clearTruths() {
-            var self = this,
-                truths = self.output.querySelector("[data-true], [data-false]");
+            var config = this.config,
+                truths = this.output.querySelector( "[" + config.trueSelector + "], [" + config.falseSelector + "]" );
 
             if ( truths ) {
-                self.output = self.removeWrapper.call( self, truths );
-                return self.clearTruths();
+                if ( !truths.hasAttribute( config.leaveConditionalSelector ) && !config.leaveConditional ) {
+                    this.output = this.removeWrapper( truths );
+                    return this.clearTruths();
+                }
+                return this.output;
             }
-            return self.output;
+            return this.output;
         },
 
         "removeWrapper": function removeWrapper( elem ) {
             var parent = elem.parentNode,
                 children = elem.children,
-                childCount = children.length,
-                newElems = document.createDocumentFragment(),
-                i = 0;
+                newElems = document.createDocumentFragment();
 
             [].forEach.call( children, function( el ) {
                 newElems.appendChild( el.cloneNode( true ) );
