@@ -93,7 +93,10 @@ if (this.Element) {
             Then populate all the values
             */
             this.output = this.template.cloneNode( true );
-            this.output = this.populateTemplate( this.output, values );
+
+            if ( values && !this.isEmptyObject( values ) ) {
+                this.output = this.populateTemplate( this.output, values );
+            }
 
             /*
             Lastly, clear all true/false wrappers
@@ -101,6 +104,18 @@ if (this.Element) {
             this.output = this.clearTruths();
 
             return this.output;
+        },
+
+        "isEmptyObject": function isEmptyObject( obj ) {
+            var prop;
+
+            for ( prop in obj ) {
+                if ( obj.hasOwnProperty( prop ) ) {
+                    return false;
+                }
+            }
+
+            return true;
         },
 
         /**
